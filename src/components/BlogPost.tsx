@@ -2,7 +2,7 @@ import { useParams } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import Header from './Header';
 import { Badge } from './ui/badge';
-import { Clock } from 'lucide-react';
+import { Clock, Headphones } from 'lucide-react';
 import { postsBySlug } from 'virtual:blog-posts';
 import { useEffect, useState } from 'react';
 
@@ -77,7 +77,7 @@ export default function BlogPost() {
   }
 
   const post = postsBySlug[slug];
-  const { title, date, tags, content } = post;
+  const { title, date, tags, content, audio } = post;
 
   const handleImageError = (src: string) => {
     setImageError(prev => ({ ...prev, [src]: true }));
@@ -104,6 +104,18 @@ export default function BlogPost() {
           </div>
           
           <BlogGraphic />
+
+          {audio && (
+            <div className="mb-8 rounded-lg border border-border bg-secondary/40 p-4">
+              <div className="mb-3 flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                <Headphones className="h-4 w-4" />
+                Listen to this post
+              </div>
+              <audio controls preload="metadata" className="w-full">
+                <source src={audio} type="audio/mpeg" />
+              </audio>
+            </div>
+          )}
 
           <article className="prose prose-lg max-w-none dark:prose-invert prose-img:rounded-lg prose-img:shadow-md">
             <ReactMarkdown

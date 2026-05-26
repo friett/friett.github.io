@@ -27,3 +27,5 @@ dist-ssr
 .cursorignore
 .venv
 bun.lockb
+.env
+voice/

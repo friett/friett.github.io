@@ -10,6 +10,15 @@ export interface BlogPost {
   tags: string[];
   content: string;
   preview: string;
+  audio?: string;
+}
+
+function getAudioUrl(slug: string): string | undefined {
+  const audioPath = path.join(process.cwd(), "public", "audio", `${slug}.mp3`);
+  if (fs.existsSync(audioPath)) {
+    return `/audio/${slug}.mp3`;
+  }
+  return undefined;
 }
 
 function generatePreview(content: string, length = 150): string {
@@ -63,6 +72,7 @@ export async function getAllPosts(): Promise<BlogPost[]> {
       tags,
       content: content.trim(),
       preview: generatePreview(content),
+      audio: getAudioUrl(slug),
     };
   });
 
@@ -102,6 +112,7 @@ export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
       tags,
       content: content.trim(),
       preview: generatePreview(content),
+      audio: getAudioUrl(slug),
     };
   } catch {
     return null;
