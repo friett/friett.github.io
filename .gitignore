@@ -29,3 +29,4 @@ dist-ssr
 bun.lockb
 .env
 voice/
+public/audio/archive/
