@@ -51,7 +51,7 @@ export default function Header() {
         </nav>
         <div className="flex items-center gap-4">
           <ThemeToggle />
-          <a href="https://github.com/friedscholvinck" target="_blank" rel="noopener noreferrer"
+          <a href="https://github.com/friett" target="_blank" rel="noopener noreferrer"
               className="p-2 hover:bg-secondary rounded-full transition-colors">
             <Github className="w-5 h-5" />
           </a>
