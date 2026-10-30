@@ -221,13 +221,17 @@ SITE = Site(
 
 
 def person_json_ld(public_url: str) -> dict[str, object]:
+    # The live profile. Imported here: app.content imports SITE from this module.
+    from app.content import load_site
+
+    site = load_site()
     return {
         "@context": "https://schema.org",
         "@type": "Person",
         "@id": f"{public_url}/#person",
-        "name": SITE.name,
+        "name": site.name,
         "url": f"{public_url}/",
-        "jobTitle": SITE.role,
+        "jobTitle": site.role,
         "homeLocation": {"@type": "Place", "name": "Amsterdam, Netherlands"},
         "worksFor": {
             "@type": "Organization",
@@ -247,7 +251,7 @@ def person_json_ld(public_url: str) -> dict[str, object]:
             "Data engineering",
             "Custom software development",
         ],
-        "sameAs": [SITE.github, SITE.linkedin],
+        "sameAs": [site.github, site.linkedin],
     }
 
 

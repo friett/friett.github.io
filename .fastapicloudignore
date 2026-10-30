@@ -1,0 +1,10 @@
+# Uploaded although git ignores it: the built /ask and /admin islands (CI builds them first).
+!frontend/public/app/
+!frontend/public/app/**
+# Not needed at runtime
+frontend/app/
+tests/
+scripts/
+artifacts/
+.agents/
+data/

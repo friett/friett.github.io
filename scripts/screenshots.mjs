@@ -26,6 +26,8 @@ const shots = [
   { name: "shortcuts", path: "/", key: "?" },
   { name: "rail", path: "/blog/dokploy", rail: true, only: "desktop" },
   { name: "not-found", path: "/missing-page" },
+  { name: "ask", path: "/ask" },
+  { name: "ask-answer", path: "/ask?q=What+kind+of+work+does+Fried+do%3F" },
 ];
 
 mkdirSync(OUT, { recursive: true });

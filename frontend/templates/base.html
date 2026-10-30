@@ -17,8 +17,8 @@
     <meta name="twitter:title" content="{{ page_title }}">
     <meta name="twitter:description" content="{{ page_description }}">
     <meta name="color-scheme" content="light dark">
-    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f1f2f6">
-    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0c0d12">
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f0f3f2">
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0a0e0d">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -116,10 +116,11 @@
           </div>
         </header>
 
-        <main id="content" class="page" tabindex="-1">
+        <main id="content" class="{% block main_class %}page{% endblock %}" tabindex="-1">
           {% block content %}{% endblock %}
         </main>
 
+        {% block footer %}
         <footer class="site-footer" id="contact">
           <div class="page">
             <section class="card contact" aria-labelledby="contact-title">
@@ -141,6 +142,7 @@
             <p class="fineprint">© {{ year }} Fried. All rights reserved.</p>
           </div>
         </footer>
+        {% endblock %}
       </div>
     </div>
 
@@ -187,7 +189,7 @@
     <div id="tooltip" class="tooltip" role="tooltip" hidden></div>
     <script type="application/json" id="palette-data">{{ palette | tojson }}</script>
     <template id="palette-icons">
-      {% for name in ["house", "user", "briefcase-business", "notebook-pen", "wrench", "at-sign", "file-text", "github", "linkedin", "sun", "moon", "monitor", "link", "panel-left-close", "keyboard", "arrow-up-right"] %}
+      {% for name in ["house", "sparkles", "user", "briefcase-business", "notebook-pen", "wrench", "at-sign", "file-text", "github", "linkedin", "sun", "moon", "monitor", "link", "panel-left-close", "keyboard", "arrow-up-right"] %}
       <span data-icon="{{ name }}">{{ icon(name) }}</span>
       {% endfor %}
     </template>

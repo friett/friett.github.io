@@ -130,3 +130,54 @@ def blog_post(
             public_url, post.title, post.date, post.preview, post.slug
         ),
     )
+
+
+@router.get("/ask", response_class=HTMLResponse)
+def ask_page(
+    request: Request,
+    site: SiteDep,
+    blog: BlogStoreDep,
+    public_url: PublicUrlDep,
+) -> HTMLResponse:
+    return _render(
+        request,
+        "app.html",
+        site=site,
+        blog=blog,
+        public_url=public_url,
+        current="ask",
+        island="ask",
+        data={"q": request.query_params.get("q", "")[:500]},
+        canonical=f"{public_url}/ask",
+        page_title="Ask about Fried | Fried Schölvinck",
+        page_description=(
+            f"Ask an AI assistant about {site.name}'s work, projects and writing."
+        ),
+        og_type="website",
+        robots=INDEXABLE,
+        json_ld=None,
+    )
+
+
+@router.get("/admin", response_class=HTMLResponse)
+def admin_page(
+    request: Request,
+    site: SiteDep,
+    blog: BlogStoreDep,
+    public_url: PublicUrlDep,
+) -> HTMLResponse:
+    return _render(
+        request,
+        "app.html",
+        site=site,
+        blog=blog,
+        public_url=public_url,
+        current="admin",
+        island="admin",
+        canonical=f"{public_url}/admin",
+        page_title="Admin | Fried Schölvinck",
+        page_description="Site admin.",
+        og_type="website",
+        robots="noindex, nofollow",
+        json_ld=None,
+    )
