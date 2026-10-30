@@ -1,0 +1,104 @@
+/* shadcn/ui on the site's design tokens (frontend/public/styles.css), for the /ask and
+   /admin islands. No preflight: the page keeps the site's own base styles. Utilities are
+   generated only from src/. Every colour, radius and shadow maps to a token; the names differ
+   from the tokens on purpose, since an @theme variable with a token's own name would refer
+   to itself. */
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" source(none);
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@source "../";
+
+/* Dark follows the site's theme switch: the system setting unless the visitor chose one. */
+@custom-variant dark {
+  &:where([data-theme="dark"], [data-theme="dark"] *) {
+    @slot;
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+      @slot;
+    }
+  }
+}
+
+/* The raw shadcn variables some components read in arbitrary values. */
+:root {
+  --background: var(--surface-card);
+  --foreground: var(--text-primary);
+  --primary: var(--accent-fill);
+  --secondary: var(--surface-sunken);
+  --muted: var(--surface-hover);
+  --radius: var(--radius-menu);
+}
+
+/* The parts of Tailwind's preflight the components rely on, scoped to them and at zero
+   specificity, so any class wins. */
+:where([data-slot], [data-slot] *, .app-root, .app-root *),
+:where([data-slot], [data-slot] *, .app-root, .app-root *)::before,
+:where([data-slot], [data-slot] *, .app-root, .app-root *)::after {
+  box-sizing: border-box;
+  border: 0 solid var(--border-hairline);
+}
+:where(input, textarea, select):where([data-slot], [data-slot] *, .app-root *) {
+  font: inherit;
+  color: inherit;
+}
+:where(button[data-slot], [data-slot] button, .app-root button) {
+  background-color: transparent;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+}
+
+@theme {
+  /* The site's phone layout ends at 760px. In rem like the other breakpoints, so they sort. */
+  --breakpoint-md: 47.5625rem;
+}
+
+@theme inline {
+  --color-background: var(--surface-card);
+  --color-foreground: var(--text-primary);
+  --color-card: var(--surface-card);
+  --color-card-foreground: var(--text-primary);
+  --color-popover: var(--surface-float);
+  --color-popover-foreground: var(--text-primary);
+  --color-primary: var(--accent-fill);
+  --color-primary-foreground: var(--accent-on);
+  --color-secondary: var(--surface-sunken);
+  --color-secondary-foreground: var(--text-primary);
+  --color-muted: var(--surface-hover);
+  --color-muted-foreground: var(--text-secondary);
+  --color-accent: var(--surface-hover);
+  --color-accent-foreground: var(--text-primary);
+  --color-destructive: var(--danger-fg);
+  --color-border: var(--border-hairline);
+  --color-input: var(--border-strong);
+  --color-ring: var(--focus-ring);
+
+  --color-canvas: var(--surface-canvas);
+  --color-nav: var(--surface-nav);
+  --color-sunken: var(--surface-sunken);
+  --color-active: var(--surface-active);
+  --color-subtle: var(--text-tertiary);
+  --color-brand: var(--accent);
+  --color-brand-soft: var(--accent-soft);
+  --color-e-home: var(--entity-home);
+  --color-e-about: var(--entity-about);
+  --color-e-projects: var(--entity-projects);
+  --color-e-writing: var(--entity-writing);
+  --color-e-tools: var(--entity-tools);
+  --color-e-contact: var(--entity-contact);
+
+  --radius-md: var(--radius-control);
+  --radius-lg: var(--radius-menu);
+  --radius-xl: var(--radius-card);
+  --radius-2xl: calc(var(--radius-card) * 1.5);
+  --radius-3xl: calc(var(--radius-card) * 2);
+
+  --text-xs: var(--fs-xs);
+  --text-sm: var(--fs-base);
+
+  --shadow-floating: var(--shadow-float);
+  --shadow-raised: var(--shadow-hover);
+}

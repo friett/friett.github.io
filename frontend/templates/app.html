@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block main_class %}page-app page-app-{{ island }}{% endblock %}
+{% block footer %}{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{{ asset('app.css') }}">
+<div id="app-root" class="app-root" data-island="{{ island }}"{% for key, value in (data or {}).items() %} data-{{ key }}="{{ value }}"{% endfor %}>
+  <noscript><p class="page">This page needs JavaScript.</p></noscript>
+</div>
+<script type="module" src="{{ asset(island ~ '.js') }}"></script>
+{% endblock %}

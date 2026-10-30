@@ -37,3 +37,8 @@ __pycache__/
 # Screenshots from scripts/screenshots.mjs
 artifacts/
 .agents/skills/fastapi
+
+# Built by frontend/app (npm run build); CI builds them before deploying
+frontend/public/app/
+# Local SQLite database
+data/

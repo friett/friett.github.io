@@ -15,6 +15,19 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/app/package-lock.json
+      # The /ask and /admin islands. FastAPI Cloud does not build them, so they are built
+      # here and uploaded with the app (.fastapicloudignore keeps them).
+      - name: Build the frontend islands
+        working-directory: frontend/app
+        run: |
+          npm ci --ignore-scripts
+          npm run typecheck
+          npm run build
       - uses: astral-sh/setup-uv@v7
       - run: uv sync --locked
       - run: uv run ruff check

@@ -15,6 +15,7 @@ class NavItem(NamedTuple):
 
 
 HOME = NavItem("home", "Home", "/", "house", "h")
+ASK = NavItem("ask", "Ask AI", "/ask", "sparkles", "k")
 ABOUT = NavItem("about", "About", "/#about", "user", "a")
 PROJECTS = NavItem("projects", "Projects", "/#projects", "briefcase-business", "p")
 WRITING = NavItem("writing", "Writing", "/#blog", "notebook-pen", "w")
@@ -22,11 +23,11 @@ TOOLS = NavItem("tools", "Tools", "/#tools", "wrench", "t")
 CONTACT = NavItem("contact", "Contact", "#contact", "at-sign", "c")
 
 # Sidebar on wide screens. Contact links sit in their own group below it.
-NAV = [HOME, ABOUT, PROJECTS, WRITING, TOOLS]
+NAV = [HOME, ASK, ABOUT, PROJECTS, WRITING, TOOLS]
 # Tab bar on phones: five thumb-sized targets.
-TABS = [HOME, PROJECTS, WRITING, TOOLS, CONTACT]
+TABS = [HOME, ASK, PROJECTS, WRITING, CONTACT]
 # `g` then the key jumps to the section.
-SHORTCUT_TARGETS = [HOME, ABOUT, PROJECTS, WRITING, TOOLS, CONTACT]
+SHORTCUT_TARGETS = [HOME, ASK, ABOUT, PROJECTS, WRITING, TOOLS, CONTACT]
 
 
 def slugify(text: str) -> str:
