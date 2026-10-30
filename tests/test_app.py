@@ -102,3 +102,13 @@ def test_manifest_and_app_icons() -> None:
     for icon in manifest["icons"]:
         assert client.get(icon["src"]).status_code == 200
     assert client.get("/icons/apple-touch-icon.png").status_code == 200
+
+
+def test_post_api_lists_the_table_of_contents() -> None:
+    toc = client.get("/api/posts/openwebui").json()["toc"]
+    assert toc[0] == {
+        "id": "what-is-openwebui",
+        "title": "What is OpenWebUI?",
+        "level": 2,
+    }
+    assert any(entry["level"] == 3 for entry in toc)

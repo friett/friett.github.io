@@ -52,6 +52,13 @@ class PostSummary(BaseModel):
     audio: str | None = None
 
 
+class TocEntry(BaseModel):
+    id: str
+    title: str
+    level: int
+
+
 class Post(PostSummary):
     markdown: str
     html: str
+    toc: list[TocEntry] = Field(default_factory=list)
