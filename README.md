@@ -53,6 +53,31 @@ The GitHub Pages workflow is gone. The deploy workflow now publishes to FastAPI 
 
 Page routes are matched before those files. `/docs` shows the JSON API. New backend work belongs in `app/routers`, under `/api`, next to the site and blog routes.
 
+## Interface
+
+The pages are server-rendered HTML in an app shell: a sidebar on wide screens (collapses to an icon rail, remembered per browser) and a top bar with a bottom tab bar on phones. `frontend/public/styles.css` starts with the design tokens. Colours, surfaces and radii are CSS variables with light and dark values. Light, dark or system theme is remembered per browser, and a small script in `base.html` applies it before the first paint.
+
+`frontend/public/app.js` is optional. Without it every link, section and post still works. With it:
+
+- `⌘K` / `Ctrl+K` or `/` opens search over sections, posts, projects, profiles and tools
+- `?` shows the shortcuts, `G` then `H`, `A`, `P`, `W`, `T` or `C` jumps to a section, `[` collapses the sidebar
+
+Navigation items and the palette index live in `app/shell.py`. Icons are inline SVG from `app/icons.py`.
+
+The app icon is `frontend/public/icons/icon.svg`. After changing it, render the PNGs with any Playwright install:
+
+```bash
+PLAYWRIGHT=/path/to/node_modules/playwright node scripts/icons.mjs
+```
+
+For a visual check at phone and desktop sizes in light and dark, run the dev server on port 8123 and then:
+
+```bash
+PLAYWRIGHT=/path/to/node_modules/playwright BASE=http://127.0.0.1:8123 node scripts/screenshots.mjs
+```
+
+The screenshots go to `artifacts/screenshots/`, which git ignores.
+
 ## Blog
 
 Add a markdown file in `content/blog`. The filename is the URL slug: `content/blog/my-note.md` is served at `/blog/my-note`.

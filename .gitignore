@@ -33,3 +33,6 @@ frontend/public/audio/archive/
 __pycache__/
 .pytest_cache/
 .ruff_cache/
+
+# Screenshots from scripts/screenshots.mjs
+artifacts/
