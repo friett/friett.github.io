@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="read-progress" aria-hidden="true"></div>
+<div class="post-layout{% if post.toc | length > 1 %} has-toc{% endif %}">
+  <article class="post" aria-labelledby="post-title">
+    <nav class="crumbs" aria-label="Breadcrumb">
+      <a href="/#blog">{{ icon("arrow-left", 15) }}Writing</a>
+    </nav>
+    <h1 class="post-title" id="post-title">{{ post.title }}</h1>
+    <p class="post-meta">
+      <time datetime="{{ post.date }}">{{ post.date | pretty_date }}</time>
+      <span>{{ icon("clock", 13) }}{{ post.minutes }} min read</span>
+      {% if post.audio %}<a href="#listen">{{ icon("headphones", 13) }}Audio</a>{% endif %}
+    </p>
+    {% if post.tags %}
+    <ul class="pills">
+      {% for tag in post.tags %}
+      <li><a class="chip" href="/?topic={{ tag | urlencode }}#blog">{{ tag }}</a></li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+    {% if post.audio %}
+    <div class="card audio" id="listen">
+      <p class="card-title"><span class="entity" data-entity="writing">{{ icon("headphones") }}</span>Listen to this post</p>
+      <audio controls preload="metadata">
+        <source src="{{ post.audio }}" type="audio/mpeg">
+      </audio>
+    </div>
+    {% endif %}
+    {% if post.toc | length > 1 %}
+    <details class="toc" id="toc">
+      <summary>{{ icon("list", 15) }}On this page</summary>
+      <ol>
+        {% for entry in post.toc %}
+        <li{% if entry.level == 3 %} class="toc-sub"{% endif %}><a href="#{{ entry.id }}">{{ entry.title }}</a></li>
+        {% endfor %}
+      </ol>
+    </details>
+    {% endif %}
+    <div class="prose">{{ post.html | safe }}</div>
+    {% if related %}
+    <aside class="related" aria-labelledby="related-title">
+      <h2 class="group-label" id="related-title">More on this topic</h2>
+      <div class="card list-card">
+        <ul class="row-list">
+          {% for item in related %}
+          <li>
+            <a class="row" href="/blog/{{ item.slug }}">
+              <span class="row-icon">{{ icon("file-text") }}</span>
+              <span class="row-main"><span class="row-title">{{ item.title }}</span><span class="row-sub">{{ item.minutes }} min read</span></span>
+              <span class="row-end">{{ icon("chevron-right") }}</span>
+            </a>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </aside>
+    {% endif %}
+    {% if newer or older %}
+    <nav class="post-nav" aria-label="More writing">
+      {% if newer %}
+      <a class="card" href="/blog/{{ newer.slug }}" rel="prev">
+        <span class="row-sub">Newer</span>
+        <span class="row-title">{{ newer.title }}</span>
+      </a>
+      {% endif %}
+      {% if older %}
+      <a class="card older" href="/blog/{{ older.slug }}" rel="next">
+        <span class="row-sub">Older</span>
+        <span class="row-title">{{ older.title }}</span>
+      </a>
+      {% endif %}
+    </nav>
+    {% endif %}
+  </article>
+</div>
+{% endblock %}

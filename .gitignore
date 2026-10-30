@@ -29,4 +29,10 @@ dist-ssr
 bun.lockb
 .env
 voice/
-public/audio/archive/
+frontend/public/audio/archive/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+
+# Screenshots from scripts/screenshots.mjs
+artifacts/

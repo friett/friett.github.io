@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>{{ page_title }}</title>
+    <meta name="description" content="{{ page_description }}">
+    <meta name="author" content="Fried Schölvinck">
+    <meta name="robots" content="{{ robots }}">
+    <link rel="canonical" href="{{ canonical }}">
+    <meta property="og:type" content="{{ og_type }}">
+    <meta property="og:site_name" content="Fried Schölvinck">
+    <meta property="og:title" content="{{ page_title }}">
+    <meta property="og:description" content="{{ page_description }}">
+    <meta property="og:url" content="{{ canonical }}">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="{{ page_title }}">
+    <meta name="twitter:description" content="{{ page_description }}">
+    <meta name="color-scheme" content="light dark">
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f1f2f6">
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0c0d12">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Fried">
+    <link rel="manifest" href="/manifest.webmanifest">
+    <link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
+    <link rel="icon" href="/icons/icon-32.png" type="image/png" sizes="32x32">
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+    <script>
+      // Before first paint: the explicit theme and the sidebar state, so neither flashes.
+      (function () {
+        var root = document.documentElement;
+        root.classList.add("js");
+        try {
+          var theme = localStorage.getItem("fried:theme") || localStorage.getItem("theme");
+          if (theme === "light" || theme === "dark") root.setAttribute("data-theme", theme);
+          var nav = localStorage.getItem("fried:nav");
+          // Without a stored choice, tablets start with the icon rail.
+          if (!nav && innerWidth > 760 && innerWidth < 1024) nav = "collapsed";
+          if (nav === "collapsed" || nav === "expanded") root.setAttribute("data-nav", nav);
+        } catch (error) {}
+      })();
+    </script>
+    {% if json_ld %}
+    <script type="application/ld+json">{{ json_ld | tojson }}</script>
+    {% endif %}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <a class="skip" href="#content">Skip to content</a>
+    <div class="shell">
+      <div class="sidebar-col">
+        <nav class="sidebar" aria-label="Main">
+          <a class="brand" href="/" aria-label="Fried Schölvinck, home">
+            <img class="brand-mark" src="/icons/icon.svg" alt="" width="24" height="24">
+            <span class="nav-label">Fried Schölvinck</span>
+          </a>
+          <ul class="nav-list">
+            {% for item in nav %}
+            <li>
+              <a class="nav-item" href="{{ item.href }}" data-section="{{ item.id }}" data-tip="{{ item.label }}" data-tip-side="right"{% if current == item.id %} aria-current="page"{% endif %}>
+                {{ icon(item.icon) }}<span class="nav-label">{{ item.label }}</span>
+              </a>
+            </li>
+            {% endfor %}
+          </ul>
+          <p class="nav-heading">Elsewhere</p>
+          <ul class="nav-list">
+            {% for profile in profiles %}
+            <li>
+              <a class="nav-item" href="{{ profile.href }}" target="_blank" rel="noopener noreferrer me" data-tip="{{ profile.label }}" data-tip-side="right">
+                {{ icon(profile.icon) }}<span class="nav-label">{{ profile.label }}</span>
+                <span class="nav-meta">{{ icon("arrow-up-right", 14) }}</span>
+              </a>
+            </li>
+            {% endfor %}
+          </ul>
+          <div class="sidebar-foot js-only">
+            <button type="button" class="nav-item" data-action="palette" data-tip="Search" data-tip-side="right" aria-keyshortcuts="Meta+K Control+K /">
+              {{ icon("search") }}<span class="nav-label">Search</span>
+              <span class="nav-meta"><kbd class="kbd" data-mod>Ctrl</kbd><kbd class="kbd">K</kbd></span>
+            </button>
+            <button type="button" class="nav-item" data-action="shortcuts" data-tip="Keyboard shortcuts" data-tip-side="right" aria-keyshortcuts="?">
+              {{ icon("keyboard") }}<span class="nav-label">Shortcuts</span>
+              <span class="nav-meta"><kbd class="kbd">?</kbd></span>
+            </button>
+            <div class="theme-seg" role="group" aria-label="Theme">
+              <button type="button" data-theme-choice="light" aria-pressed="false" aria-label="Light theme" data-tip="Light">{{ icon("sun", 15) }}</button>
+              <button type="button" data-theme-choice="dark" aria-pressed="false" aria-label="Dark theme" data-tip="Dark">{{ icon("moon", 15) }}</button>
+              <button type="button" data-theme-choice="system" aria-pressed="false" aria-label="System theme" data-tip="System">{{ icon("monitor", 15) }}</button>
+            </div>
+            <button type="button" class="nav-item theme-cycle" data-action="theme-cycle" data-tip="Theme" data-tip-side="right" aria-label="Change theme">
+              <span class="theme-icon">{{ icon("sun", 16) }}{{ icon("moon", 16) }}{{ icon("monitor", 16) }}</span>
+            </button>
+            <button type="button" class="nav-item" data-action="toggle-nav" data-tip="Collapse sidebar" data-tip-side="right" aria-keyshortcuts="[" aria-label="Collapse sidebar">
+              <span class="collapse-icon">{{ icon("panel-left-close") }}{{ icon("panel-left-open") }}</span><span class="nav-label">Collapse</span>
+              <span class="nav-meta"><kbd class="kbd">[</kbd></span>
+            </button>
+          </div>
+        </nav>
+      </div>
+
+      <div class="main">
+        <header class="topbar">
+          <a class="brand" href="/" aria-label="Fried Schölvinck, home">
+            <img class="brand-mark" src="/icons/icon.svg" alt="" width="24" height="24">
+            <span>Fried</span>
+          </a>
+          <div class="topbar-actions js-only">
+            <button type="button" class="icon-btn" data-action="palette" aria-label="Search" data-tip="Search">{{ icon("search", 18) }}</button>
+            <button type="button" class="icon-btn" data-action="theme-cycle" aria-label="Change theme" data-tip="Theme"><span class="theme-icon">{{ icon("sun", 18) }}{{ icon("moon", 18) }}{{ icon("monitor", 18) }}</span></button>
+          </div>
+        </header>
+
+        <main id="content" class="page" tabindex="-1">
+          {% block content %}{% endblock %}
+        </main>
+
+        <footer class="site-footer" id="contact">
+          <div class="page">
+            <section class="card contact" aria-labelledby="contact-title">
+              <div class="card-head">
+                <h2 class="card-title" id="contact-title"><span class="entity" data-entity="contact">{{ icon("at-sign") }}</span>Contact</h2>
+              </div>
+              <ul class="row-list">
+                {% for profile in profiles %}
+                <li>
+                  <a class="row" href="{{ profile.href }}" target="_blank" rel="noopener noreferrer me">
+                    <span class="row-icon">{{ icon(profile.icon, 18) }}</span>
+                    <span class="row-main"><span class="row-title">{{ profile.label }}</span><span class="row-sub">{{ profile.href | bare_url }}</span></span>
+                    <span class="row-end">{{ icon("arrow-up-right") }}</span>
+                  </a>
+                </li>
+                {% endfor %}
+              </ul>
+            </section>
+            <p class="fineprint">© {{ year }} Fried. All rights reserved.</p>
+          </div>
+        </footer>
+      </div>
+    </div>
+
+    <nav class="tabbar" aria-label="Sections">
+      {% for item in tabs %}
+      <a class="tab" href="{{ item.href }}" data-section="{{ item.id }}"{% if current == item.id %} aria-current="page"{% endif %}>
+        {{ icon(item.icon, 20) }}<span>{{ item.label }}</span>
+      </a>
+      {% endfor %}
+    </nav>
+
+    <button type="button" id="filter-clear" class="filter-clear" hidden></button>
+
+    <dialog id="palette" class="dialog palette" aria-label="Search">
+      <div class="palette-input">
+        {{ icon("search") }}
+        <input id="palette-query" type="text" role="combobox" aria-expanded="true" aria-controls="palette-list" aria-autocomplete="list" aria-label="Search posts, projects and pages" placeholder="Search posts, projects, pages…" autocomplete="off" spellcheck="false">
+        <kbd class="kbd">Esc</kbd>
+      </div>
+      <div id="palette-list" class="palette-list" role="listbox" aria-label="Results"></div>
+      <div class="palette-foot" aria-hidden="true">
+        <span><kbd class="kbd">↑</kbd><kbd class="kbd">↓</kbd> move</span>
+        <span><kbd class="kbd">{{ icon("corner-down-left", 11) }}</kbd> open</span>
+        <span><kbd class="kbd">?</kbd> shortcuts</span>
+      </div>
+    </dialog>
+
+    <dialog id="shortcuts" class="dialog" aria-labelledby="shortcuts-title">
+      <div class="dialog-head">
+        <h2 class="dialog-title" id="shortcuts-title" tabindex="-1" autofocus>Keyboard shortcuts</h2>
+        <button type="button" class="icon-btn" data-close aria-label="Close" data-tip="Close">{{ icon("x") }}</button>
+      </div>
+      <dl class="shortcut-grid">
+        <dt>Search</dt><dd><kbd class="kbd" data-mod>Ctrl</kbd><kbd class="kbd">K</kbd> <span class="or">or</span> <kbd class="kbd">/</kbd></dd>
+        <dt>Keyboard shortcuts</dt><dd><kbd class="kbd">?</kbd></dd>
+        {% for item in shortcut_targets %}
+        <dt>{{ item.label }}</dt><dd><kbd class="kbd">G</kbd><kbd class="kbd">{{ item.key | upper }}</kbd></dd>
+        {% endfor %}
+        <dt>Collapse or expand the sidebar</dt><dd><kbd class="kbd">[</kbd></dd>
+        <dt>Close or cancel</dt><dd><kbd class="kbd">Esc</kbd></dd>
+      </dl>
+    </dialog>
+
+    <div id="tooltip" class="tooltip" role="tooltip" hidden></div>
+    <script type="application/json" id="palette-data">{{ palette | tojson }}</script>
+    <template id="palette-icons">
+      {% for name in ["house", "user", "briefcase-business", "notebook-pen", "wrench", "at-sign", "file-text", "github", "linkedin", "sun", "moon", "monitor", "link", "panel-left-close", "keyboard", "arrow-up-right"] %}
+      <span data-icon="{{ name }}">{{ icon(name) }}</span>
+      {% endfor %}
+    </template>
+    <script src="/app.js" defer></script>
+  </body>
+</html>

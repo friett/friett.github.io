@@ -1,0 +1,64 @@
+from pydantic import BaseModel, Field
+
+
+class Health(BaseModel):
+    status: str
+
+
+class SkillGroup(BaseModel):
+    category: str
+    items: list[str]
+
+
+class Project(BaseModel):
+    title: str
+    description: str
+    tags: list[str]
+    date: str
+    link: str | None = None
+    preview: str | None = None
+    featured: bool = False
+    eyebrow: str | None = None
+    highlights: list[str] = Field(default_factory=list)
+
+
+class Tool(BaseModel):
+    name: str
+    icon: str
+    description: str
+    url: str
+
+
+class Site(BaseModel):
+    name: str
+    role: str
+    location: str
+    bio: list[str]
+    phrases: list[str]
+    skills: list[SkillGroup]
+    projects: list[Project]
+    tools: list[Tool]
+    github: str
+    linkedin: str
+
+
+class PostSummary(BaseModel):
+    slug: str
+    title: str
+    date: str
+    tags: list[str]
+    preview: str
+    minutes: int
+    audio: str | None = None
+
+
+class TocEntry(BaseModel):
+    id: str
+    title: str
+    level: int
+
+
+class Post(PostSummary):
+    markdown: str
+    html: str
+    toc: list[TocEntry] = Field(default_factory=list)
