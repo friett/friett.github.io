@@ -36,3 +36,4 @@ __pycache__/
 
 # Screenshots from scripts/screenshots.mjs
 artifacts/
+.agents/skills/fastapi
