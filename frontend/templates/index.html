@@ -1,96 +1,100 @@
 {% extends "base.html" %}
 
 {% block content %}
-<section class="hero">
-  <div class="container">
-    <p class="role-label">{{ site.role }}</p>
-    <h1 class="heading">Hello, I'm Fried.<br>I build <span class="typed-wrap"><span id="typed">{{ site.phrases[0] }}</span><span class="caret" aria-hidden="true"></span></span></h1>
-    <div class="hero-meta">
-      <p>📍 {{ site.location }}</p>
-      <div class="hero-actions">
-        <a class="text-button" href="#projects">Selected work</a>
-        <a class="text-button" href="#blog">Writing</a>
-        <button type="button" class="text-button" id="about-open">About me</button>
-      </div>
-    </div>
+<section class="hero" id="top" aria-labelledby="hero-title">
+  <p class="eyebrow">{{ icon("map-pin", 14) }}<span>{{ site.role }} · {{ site.location }}</span></p>
+  <h1 class="hero-title" id="hero-title">Hello, I'm Fried.<br>I build <span class="typed-wrap"><span id="typed">{{ site.phrases[0] }}</span><span class="caret" aria-hidden="true"></span></span></h1>
+  <div class="hero-actions">
+    <a class="btn btn-primary" href="#projects">{{ icon("briefcase-business") }}Selected work</a>
+    <a class="btn" href="#blog">{{ icon("notebook-pen") }}Writing</a>
+    <a class="btn" href="#about">{{ icon("user") }}About me</a>
+    {% for profile in profiles %}
+    <a class="icon-btn icon-btn-bordered" href="{{ profile.href }}" target="_blank" rel="noopener noreferrer me" aria-label="{{ profile.label }}" data-tip="{{ profile.label }}">{{ icon(profile.icon) }}</a>
+    {% endfor %}
   </div>
 </section>
-
-<dialog id="about-dialog" aria-labelledby="about-title">
-  <form method="dialog">
-    <div class="dialog-head">
-      <h2 id="about-title">About me</h2>
-      <button class="text-button" value="close">Close</button>
-    </div>
-    {% for paragraph in site.bio %}
-    <p>{{ paragraph }}</p>
-    {% endfor %}
-  </form>
-</dialog>
 <script type="application/json" id="typed-phrases">{{ site.phrases | tojson }}</script>
 
-<section id="skills" class="section">
-  <div class="container">
-    <h2 class="section-title">🔨 Skills</h2>
-    <p class="lede">Technical expertise developed through academic education, hobby projects and professional experience.</p>
-    <div class="skill-grid">
-      {% for group in site.skills %}
-      <article class="card reveal">
-        <h3>{{ group.category }}</h3>
+<section id="about" class="section" aria-labelledby="about-title">
+  <header class="section-head">
+    <h2 class="section-title" id="about-title"><span class="entity" data-entity="about">{{ icon("user", 18) }}</span>About me</h2>
+  </header>
+  <div class="about-grid">
+    <article class="card card-body bio">
+      {% for paragraph in site.bio %}
+      <p>{{ paragraph }}</p>
+      {% endfor %}
+    </article>
+    <section id="skills" class="card" aria-labelledby="skills-title">
+      <div class="card-head">
+        <h3 class="card-title" id="skills-title"><span class="entity" data-entity="about">{{ icon("hammer") }}</span>Skills</h3>
+      </div>
+      <div class="card-body">
+        <p class="lede">Technical expertise developed through academic education, hobby projects and professional experience.</p>
+        {% for group in site.skills %}
+        <h4 class="group-label">{{ group.category }}</h4>
         <ul class="pills">
           {% for item in group.items %}
-          <li><button type="button" class="chip" data-filter="{{ item }}">{{ item }}</button></li>
+          <li><button type="button" class="chip" data-filter="{{ item }}" aria-pressed="false">{{ item }}</button></li>
           {% endfor %}
         </ul>
-      </article>
-      {% endfor %}
-    </div>
+        {% endfor %}
+      </div>
+    </section>
   </div>
 </section>
 
-<section id="projects" class="section">
-  <div class="container">
-    <h2 class="section-title">💼 Work & projects</h2>
+<section id="projects" class="section" aria-labelledby="projects-title">
+  <header class="section-head">
+    <h2 class="section-title" id="projects-title"><span class="entity" data-entity="projects">{{ icon("briefcase-business", 18) }}</span>Work & projects</h2>
     <p class="lede">Products and systems I have built through Coldfinch and in my work as an AI engineer.</p>
-    <p id="project-empty" class="filter-empty" hidden>No projects match this topic.</p>
-    <div class="feature-list">
-      {% for project in site.projects if project.featured %}
-      <article class="feature reveal" data-match="{{ (project.title ~ ' ' ~ project.description ~ ' ' ~ project.tags|join(' ') ~ ' ' ~ project.highlights|join(' ')) | lower }}">
-        <div class="browser" data-preview="{{ project.preview }}">
-          <div class="browser-bar" aria-hidden="true">
-            <span></span><span></span><span></span>
-            <p>{{ project.link | replace("https://", "") | replace("http://", "") }}</p>
-          </div>
-          <button type="button" class="preview-load">
-            <strong>Load live preview</strong>
-            <span>Interactive website embedded here</span>
-          </button>
-        </div>
-        <div class="feature-copy">
-          {% if project.eyebrow %}<p class="kicker">{{ project.eyebrow }}</p>{% endif %}
-          <div class="title-row">
-            <h3>{{ project.title }}</h3>
-            <p>{{ project.date }}</p>
-          </div>
-          <p class="muted-copy">{{ project.description }}</p>
-          <ul class="pills">
-            {% for tag in project.tags %}<li><button type="button" class="chip" data-filter="{{ tag }}">{{ tag }}</button></li>{% endfor %}
-          </ul>
-          {% if project.link %}
-          <a class="live-link" href="{{ project.link }}" target="_blank" rel="noopener noreferrer">Open live site <span aria-hidden="true">↗</span></a>
-          {% endif %}
-        </div>
-      </article>
-      {% endfor %}
-    </div>
-    <div class="card-grid">
-      {% for project in site.projects if not project.featured %}
-      <article class="card reveal" data-match="{{ (project.title ~ ' ' ~ project.description ~ ' ' ~ project.tags|join(' ') ~ ' ' ~ project.highlights|join(' ')) | lower }}">
+  </header>
+  <div id="project-empty" class="empty" hidden>
+    <span>No projects match this topic.</span>
+    <button type="button" class="btn btn-sm" data-action="clear-filter">Show all</button>
+  </div>
+  <div class="feature-list">
+    {% for project in site.projects if project.featured %}
+    <article class="card feature" id="project-{{ project.title | slug }}" data-match="{{ (project.title ~ ' ' ~ project.description ~ ' ' ~ project.tags|join(' ') ~ ' ' ~ project.highlights|join(' ')) | lower }}">
+      <div class="feature-copy">
+        {% if project.eyebrow %}<p class="kicker">{{ project.eyebrow }}</p>{% endif %}
         <div class="title-row">
           <h3>{{ project.title }}</h3>
-          <p>{{ project.date }}</p>
+          <span class="date">{{ project.date }}</span>
         </div>
-        <p class="muted-copy">{{ project.description }}</p>
+        <p class="muted">{{ project.description }}</p>
+        <ul class="pills">
+          {% for tag in project.tags %}<li><button type="button" class="chip" data-filter="{{ tag }}" aria-pressed="false">{{ tag }}</button></li>{% endfor %}
+        </ul>
+        {% if project.link %}
+        <a class="btn btn-sm live-link" href="{{ project.link }}" target="_blank" rel="noopener noreferrer">{{ icon("globe", 15) }}{{ project.link | bare_url }}{{ icon("arrow-up-right", 14) }}</a>
+        {% endif %}
+      </div>
+      {% if project.preview %}
+      <div class="browser js-only" data-preview="{{ project.preview }}">
+        <div class="browser-bar" aria-hidden="true">
+          <span></span><span></span><span></span>
+          <p>{{ project.link | bare_url }}</p>
+        </div>
+        <button type="button" class="preview-load">
+          {{ icon("monitor", 20) }}
+          <strong>Load live preview</strong>
+          <span>Interactive website embedded here</span>
+        </button>
+      </div>
+      {% endif %}
+    </article>
+    {% endfor %}
+  </div>
+  <div class="card list-card">
+    <ul class="row-list">
+      {% for project in site.projects if not project.featured %}
+      <li id="project-{{ project.title | slug }}" class="project-row" data-match="{{ (project.title ~ ' ' ~ project.description ~ ' ' ~ project.tags|join(' ') ~ ' ' ~ project.highlights|join(' ')) | lower }}">
+        <div class="title-row">
+          <h3>{{ project.title }}</h3>
+          <span class="date">{{ project.date }}</span>
+        </div>
+        <p class="muted">{{ project.description }}</p>
         {% if project.highlights %}
         <ul class="highlights">
           {% for highlight in project.highlights %}
@@ -99,53 +103,65 @@
         </ul>
         {% endif %}
         <ul class="pills">
-          {% for tag in project.tags %}<li><button type="button" class="chip" data-filter="{{ tag }}">{{ tag }}</button></li>{% endfor %}
+          {% for tag in project.tags %}<li><button type="button" class="chip" data-filter="{{ tag }}" aria-pressed="false">{{ tag }}</button></li>{% endfor %}
         </ul>
         {% if project.link %}
-        <a class="live-link" href="{{ project.link }}" target="_blank" rel="noopener noreferrer">Visit <span aria-hidden="true">↗</span></a>
+        <a class="btn btn-sm live-link" href="{{ project.link }}" target="_blank" rel="noopener noreferrer">{{ icon("globe", 15) }}{{ project.link | bare_url }}{{ icon("arrow-up-right", 14) }}</a>
         {% endif %}
-      </article>
+      </li>
       {% endfor %}
-    </div>
+    </ul>
   </div>
 </section>
 
-<section id="blog" class="section">
-  <div class="container">
-    <h2 class="section-title">🖋️ Blog</h2>
+<section id="blog" class="section" aria-labelledby="blog-title">
+  <header class="section-head">
+    <h2 class="section-title" id="blog-title"><span class="entity" data-entity="writing">{{ icon("notebook-pen", 18) }}</span>Writing</h2>
     <p class="lede">Tips, thoughts and my opinions on technology, software development and AI.</p>
-    <div class="post-grid">
+  </header>
+  <div class="card list-card">
+    <ul class="row-list">
       {% for post in posts %}
-      <a class="card post-card reveal" href="/blog/{{ post.slug }}" data-match="{{ (post.title ~ ' ' ~ post.preview ~ ' ' ~ post.tags|join(' ')) | lower }}">
-        <p class="post-kicker">
-          <time datetime="{{ post.date }}">{{ post.date | pretty_date }}</time>
-          <span>{{ post.minutes }} min read</span>
-          {% if post.audio %}<span>Audio</span>{% endif %}
-        </p>
-        <h3>{{ post.title }}</h3>
-        <p>{{ post.preview }}</p>
-      </a>
-      {% endfor %}
-    </div>
-    <p id="blog-empty" class="filter-empty" hidden>No posts match this topic.</p>
-  </div>
-</section>
-
-<section id="tools" class="section">
-  <div class="container">
-    <h2 class="section-title">🧰 Tools</h2>
-    <p class="lede">(dev) tools I like to use</p>
-    <ul class="tools">
-      {% for tool in site.tools %}
-      <li>
-        <a class="tool-link" href="{{ tool.url }}" target="_blank" rel="noopener noreferrer">
-          <img src="{{ tool.icon }}" alt="" width="48" height="48">
-          <span>{{ tool.name }}</span>
-          <span class="tool-note">{{ tool.description }}</span>
+      <li data-match="{{ (post.title ~ ' ' ~ post.preview ~ ' ' ~ post.tags|join(' ')) | lower }}">
+        <a class="row post-row" href="/blog/{{ post.slug }}">
+          <span class="row-main">
+            <span class="row-title">{{ post.title }}</span>
+            <span class="row-sub">{{ post.preview }}</span>
+            <span class="post-meta">
+              <time datetime="{{ post.date }}">{{ post.date | pretty_date }}</time>
+              <span>{{ icon("clock", 13) }}{{ post.minutes }} min read</span>
+              {% if post.audio %}<span>{{ icon("headphones", 13) }}Audio</span>{% endif %}
+            </span>
+          </span>
+          <span class="row-end">{{ icon("chevron-right") }}</span>
         </a>
       </li>
       {% endfor %}
     </ul>
   </div>
+  <div id="blog-empty" class="empty" hidden>
+    <span>No posts match this topic.</span>
+    <button type="button" class="btn btn-sm" data-action="clear-filter">Show all</button>
+  </div>
+</section>
+
+<section id="tools" class="section" aria-labelledby="tools-title">
+  <header class="section-head">
+    <h2 class="section-title" id="tools-title"><span class="entity" data-entity="tools">{{ icon("wrench", 18) }}</span>Tools</h2>
+    <p class="lede">(dev) tools I like to use</p>
+  </header>
+  <ul class="tools">
+    {% for tool in site.tools %}
+    <li>
+      <a class="card tool" href="{{ tool.url }}" target="_blank" rel="noopener noreferrer">
+        <img src="{{ tool.icon }}" alt="" width="36" height="36" loading="lazy">
+        <span class="tool-text">
+          <span class="row-title">{{ tool.name }}</span>
+          <span class="row-sub">{{ tool.description }}</span>
+        </span>
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
 </section>
 {% endblock %}
