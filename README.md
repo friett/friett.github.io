@@ -51,6 +51,8 @@ The site keeps its content in a database, so it changes without a deploy.
 
 Set secrets with `uv run fastapi cloud env set --secret NAME`.
 
+Production uses the Neon project `portfolio` (`delicate-feather-09441654`, `aws-us-east-1`) in the `coldfinch` organization, through its pooled connection string. The admin setup link (`https://fried.coldfinch.eu/admin#setup=…`) is in the macOS Keychain as "fried.coldfinch.eu admin setup link". It works once: after the first passkey, registration is closed.
+
 ## Deploy
 
 ```bash
