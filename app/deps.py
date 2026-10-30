@@ -4,8 +4,8 @@ from typing import Annotated
 from fastapi import Depends, Request
 
 from app.blog import BlogStore, blog_store
+from app.content import load_site
 from app.models import Site
-from app.site import SITE
 
 
 def get_blog_store() -> BlogStore:
@@ -13,7 +13,7 @@ def get_blog_store() -> BlogStore:
 
 
 def get_site() -> Site:
-    return SITE
+    return load_site()
 
 
 def get_public_url(request: Request) -> str:

@@ -3,8 +3,9 @@ from html import escape
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse, PlainTextResponse, Response
 
+from app.content import load_site
 from app.deps import BlogStoreDep, PublicUrlDep
-from app.site import HOME_DESCRIPTION, SITE
+from app.site import HOME_DESCRIPTION
 
 router = APIRouter(include_in_schema=False)
 
@@ -30,8 +31,8 @@ def robots(public_url: PublicUrlDep) -> str:
 
 # Colours match the navigation surface in styles.css, so the iOS status bar and
 # the Android splash screen blend with the page.
-THEME_LIGHT = "#f1f2f6"
-THEME_DARK = "#0c0d12"
+THEME_LIGHT = "#f0f3f2"
+THEME_DARK = "#0a0e0d"
 
 
 @router.get("/manifest.webmanifest")
@@ -53,7 +54,7 @@ def manifest() -> JSONResponse:
     ]
     return JSONResponse(
         {
-            "name": SITE.name,
+            "name": load_site().name,
             "short_name": "Fried",
             "description": HOME_DESCRIPTION,
             "id": "/",
@@ -98,7 +99,7 @@ def sitemap(public_url: PublicUrlDep, blog: BlogStoreDep) -> Response:
 @router.get("/llms.txt", response_class=PlainTextResponse)
 def llms(public_url: PublicUrlDep, blog: BlogStoreDep) -> str:
     lines = [
-        f"# {SITE.name}",
+        f"# {load_site().name}",
         "",
         f"> {HOME_DESCRIPTION}",
         "",
@@ -138,8 +139,8 @@ def llms(public_url: PublicUrlDep, blog: BlogStoreDep) -> str:
             "",
             "## Profiles",
             "",
-            f"- [GitHub]({SITE.github})",
-            f"- [LinkedIn]({SITE.linkedin})",
+            f"- [GitHub]({load_site().github})",
+            f"- [LinkedIn]({load_site().linkedin})",
             "- [Xomnia](https://xomnia.com/)",
             "",
         ]

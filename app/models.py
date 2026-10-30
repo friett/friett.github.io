@@ -29,17 +29,33 @@ class Tool(BaseModel):
     url: str
 
 
-class Site(BaseModel):
+class Role(BaseModel):
+    """A position, as LinkedIn lists it. Months are YYYY-MM; no end means current."""
+
+    company: str
+    title: str
+    start: str
+    end: str | None = None
+    location: str | None = None
+    description: str = ""
+    url: str | None = None
+
+
+class Profile(BaseModel):
     name: str
     role: str
     location: str
     bio: list[str]
     phrases: list[str]
+    github: str
+    linkedin: str
+
+
+class Site(Profile):
     skills: list[SkillGroup]
     projects: list[Project]
     tools: list[Tool]
-    github: str
-    linkedin: str
+    roles: list[Role] = Field(default_factory=list)
 
 
 class PostSummary(BaseModel):

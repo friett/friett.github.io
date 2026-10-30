@@ -5,9 +5,15 @@ description = "Personal site of Fried Schölvinck"
 requires-python = ">=3.13"
 dependencies = [
     "fastapi[standard]>=0.162.0",
+    "httpx>=0.28.1",
+    "itsdangerous>=2.2.0",
     "jinja2>=3.1.6",
     "markdown>=3.11.2",
+    "psycopg[binary]>=3.3.6",
+    "pydantic-settings>=2.14.0",
     "python-frontmatter>=1.3.0",
+    "sqlmodel>=0.0.48",
+    "webauthn>=3.0.1",
 ]
 
 [dependency-groups]
@@ -31,3 +37,8 @@ extend-exclude = ["content"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "FAST"]
+
+[tool.ruff.lint.per-file-ignores]
+# The model prompts are prose; wrapping them would change what the model reads.
+"app/chat.py" = ["E501"]
+"app/suggest.py" = ["E501"]
