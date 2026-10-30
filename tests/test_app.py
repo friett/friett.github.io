@@ -88,3 +88,17 @@ def test_assets_sitemap_and_unknown_page() -> None:
     missing = client.get("/not-a-page", headers=HTML)
     assert missing.status_code == 404
     assert "Page not found" in missing.text
+
+
+def test_manifest_and_app_icons() -> None:
+    response = client.get("/manifest.webmanifest")
+    assert response.status_code == 200
+    assert response.headers["content-type"].startswith("application/manifest+json")
+    manifest = response.json()
+    assert manifest["start_url"] == "/"
+    assert manifest["display"] == "standalone"
+    purposes = {icon.get("purpose", "any") for icon in manifest["icons"]}
+    assert "maskable" in purposes
+    for icon in manifest["icons"]:
+        assert client.get(icon["src"]).status_code == 200
+    assert client.get("/icons/apple-touch-icon.png").status_code == 200

@@ -1,7 +1,7 @@
 from html import escape
 
 from fastapi import APIRouter
-from fastapi.responses import PlainTextResponse, Response
+from fastapi.responses import JSONResponse, PlainTextResponse, Response
 
 from app.deps import BlogStoreDep, PublicUrlDep
 from app.site import HOME_DESCRIPTION, SITE
@@ -25,6 +25,48 @@ def robots(public_url: PublicUrlDep) -> str:
         "Allow: /\n"
         "\n"
         f"Sitemap: {public_url}/sitemap.xml\n"
+    )
+
+
+# Colours match the navigation surface in styles.css, so the iOS status bar and
+# the Android splash screen blend with the page.
+THEME_LIGHT = "#f1f2f6"
+THEME_DARK = "#0c0d12"
+
+
+@router.get("/manifest.webmanifest")
+def manifest() -> JSONResponse:
+    icons = [
+        {"src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png"},
+        {"src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png"},
+        {
+            "src": "/icons/icon-maskable-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable",
+        },
+        {"src": "/icons/icon.svg", "sizes": "any", "type": "image/svg+xml"},
+    ]
+    shortcuts = [
+        {"name": "Writing", "url": "/#blog"},
+        {"name": "Projects", "url": "/#projects"},
+    ]
+    return JSONResponse(
+        {
+            "name": SITE.name,
+            "short_name": "Fried",
+            "description": HOME_DESCRIPTION,
+            "id": "/",
+            "start_url": "/",
+            "scope": "/",
+            "display": "standalone",
+            "lang": "en",
+            "background_color": THEME_LIGHT,
+            "theme_color": THEME_LIGHT,
+            "icons": icons,
+            "shortcuts": shortcuts,
+        },
+        media_type="application/manifest+json",
     )
 
 
