@@ -2,6 +2,7 @@
 
 import json
 import re
+from urllib.parse import urlsplit
 
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import StreamingResponse
@@ -30,8 +31,10 @@ async def ask(
     request: Request, site: SiteDep, blog: BlogStoreDep, public_url: PublicUrlDep
 ) -> StreamingResponse:
     """Answer the last question as Server-Sent Events: delta, then done or error."""
+    # Only the site's own pages may use the chat and its free quota, under any address
+    # the site has (custom domain or fastapicloud.dev).
     origin = request.headers.get("origin")
-    if origin and origin != get_settings().origin:
+    if origin and urlsplit(origin).netloc != request.headers.get("host", ""):
         raise HTTPException(status_code=403, detail="Cross-site request")
     try:
         body = await request.json()
