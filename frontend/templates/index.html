@@ -4,6 +4,11 @@
 <section class="hero" id="top" aria-labelledby="hero-title">
   <p class="eyebrow">{{ icon("map-pin", 14) }}<span>{{ site.role }} · {{ site.location }}</span></p>
   <h1 class="hero-title" id="hero-title">Hello, I'm Fried.<br>I build <span class="typed-wrap"><span id="typed">{{ site.phrases[0] }}</span><span class="caret" aria-hidden="true"></span></span></h1>
+  <form class="hero-ask" action="/ask" method="get" role="search" aria-label="Ask AI about Fried">
+    <span class="hero-ask-icon" aria-hidden="true">{{ icon("sparkles") }}</span>
+    <input name="q" type="text" maxlength="500" autocomplete="off" aria-label="Ask a question about Fried" placeholder="Ask AI about my work, projects or tools…">
+    <button type="submit" class="btn btn-primary btn-sm">Ask</button>
+  </form>
   <div class="hero-actions">
     <a class="btn btn-primary" href="#projects">{{ icon("briefcase-business") }}Selected work</a>
     <a class="btn" href="#blog">{{ icon("notebook-pen") }}Writing</a>
@@ -20,11 +25,32 @@
     <h2 class="section-title" id="about-title"><span class="entity" data-entity="about">{{ icon("user", 18) }}</span>About me</h2>
   </header>
   <div class="about-grid">
-    <article class="card card-body bio">
-      {% for paragraph in site.bio %}
-      <p>{{ paragraph }}</p>
-      {% endfor %}
-    </article>
+    <div class="about-main">
+      <article class="card card-body bio">
+        {% for paragraph in site.bio %}
+        <p>{{ paragraph }}</p>
+        {% endfor %}
+      </article>
+      {% if site.roles %}
+      <section id="experience" class="card" aria-labelledby="experience-title">
+        <div class="card-head">
+          <h3 class="card-title" id="experience-title"><span class="entity" data-entity="projects">{{ icon("briefcase-business") }}</span>Experience</h3>
+        </div>
+        <ol class="roles">
+          {% for role in site.roles %}
+          <li class="role">
+            <div class="role-head">
+              <span class="role-title">{{ role.title }}</span>
+              <span class="role-when num">{{ role.start[:4] }}–{{ role.end[:4] if role.end else "now" }}</span>
+            </div>
+            <div class="muted">{% if role.url %}<a href="{{ role.url }}" target="_blank" rel="noopener noreferrer">{{ role.company }}</a>{% else %}{{ role.company }}{% endif %}{% if role.location %} · {{ role.location }}{% endif %}</div>
+            {% if role.description %}<p class="role-text">{{ role.description }}</p>{% endif %}
+          </li>
+          {% endfor %}
+        </ol>
+      </section>
+      {% endif %}
+    </div>
     <section id="skills" class="card" aria-labelledby="skills-title">
       <div class="card-head">
         <h3 class="card-title" id="skills-title"><span class="entity" data-entity="about">{{ icon("hammer") }}</span>Skills</h3>

@@ -11,9 +11,45 @@ uv sync
 uv run fastapi dev
 ```
 
-Open http://127.0.0.1:8000. Interactive API docs are at http://127.0.0.1:8000/docs.
+Open http://localhost:8000 (passkeys for `/admin` need a host name, not `127.0.0.1`). Interactive API docs are at http://localhost:8000/docs.
 
 `fastapi dev` runs the whole app. There is no separate frontend server.
+
+The `/ask` chat and the `/admin` dashboard are React islands in `frontend/app` (Vite, Tailwind, shadcn/ui). Build them once before you run the site, and again after you change them:
+
+```bash
+cd frontend/app && npm ci --ignore-scripts && npm run build
+```
+
+The build goes to `frontend/public/app`, which git ignores. CI builds it before every deploy.
+
+## Content, stats and the chat
+
+The site keeps its content in a database, so it changes without a deploy.
+
+- **Content.** On the first start, the app copies `app/site.py` into the `entry` table (profile, experience, projects, skill groups, tools). After that, the database is the source. `app/site.py` stays the fallback when the database is down.
+- **Admin.** `/admin` is for the owner only. Register the one passkey from `/admin#setup=<SITE_ENROLLMENT_TOKEN>`; after that, registration is closed. The admin shows visits, chat questions, and the questions the content could not answer. It edits every entry and reviews drafts.
+- **Drafts.** Changes from AI and from LinkedIn are drafts. Nothing changes on the site until the owner applies a draft.
+  - *AI suggestions* reword or restructure the content. They never add facts: a missing fact comes back as a gap for the owner to fill.
+  - *LinkedIn* has no API for an individual's positions or skills. Upload LinkedIn's data export (Settings › Data privacy › Get a copy of your data) in the admin. Positions, projects, skills and the headline become drafts.
+  - *Agents* (for example Claude with the LinkedIn connector) post drafts to `POST /api/admin/drafts` with a token from the admin.
+- **Visits.** Counting uses no cookies. Each view stores the path, the referring site, the device type and a visitor hash: SHA-256 over a random salt for the day, the IP address and the user agent. The IP address and the user agent are never stored, and each day's salt is deleted after the day. Bots, prefetches, and browsers that send Global Privacy Control or Do Not Track are not counted. Views are kept for 400 days.
+- **Chat.** `/ask` answers questions about Fried from the same content, in two modes:
+  - *Fast*: the site streams Groq's free models (`openai/gpt-oss-120b`, then `openai/gpt-oss-20b`, then `qwen/qwen3.8-27b` when one is rate limited). The free tier allows about 1,000 requests a day per model. The site also limits questions to 30 per visitor and 600 in total per day. Questions and answers are stored for the owner.
+  - *Private*: Gemma 4 E2B runs in the visitor's browser on WebGPU (`onnx-community/gemma-4-E2B-it-ONNX`, text only, q4f16, a one-time 3.1 GB download). Nothing leaves the device and nothing is stored. It needs WebGPU with 16-bit shaders, which desktop Chrome and Edge have.
+
+### Settings
+
+| Variable | Use |
+|---|---|
+| `DATABASE_URL` | Neon Postgres. Without it the app uses SQLite in `data/`, which FastAPI Cloud deletes on every redeploy. |
+| `SITE_SESSION_SECRET` | Signs the admin session cookie. Long and random. |
+| `SITE_ENROLLMENT_TOKEN` | Opens the one-time passkey setup at `/admin#setup=<token>`. |
+| `SITE_ORIGIN`, `SITE_RP_ID` | The public origin (`https://example.com`) and its host name, for passkeys and same-origin checks. |
+| `SITE_HTTPS_ONLY` | `true` in production. |
+| `GROQ_API_KEY` | The hosted chat and AI suggestions. Without it, only the private mode works. |
+
+Set secrets with `uv run fastapi cloud env set --secret NAME`.
 
 ## Deploy
 
@@ -47,7 +83,8 @@ The GitHub Pages workflow is gone. The deploy workflow now publishes to FastAPI 
 
 ## Layout
 
-- `app/` is the FastAPI app: pages, the JSON API, and markdown rendering
+- `app/` is the FastAPI app: pages, the JSON API, markdown rendering, the content store (`content.py`, `db.py`), visit counting (`tracking.py`), the chat (`chat.py`), the admin (`auth.py`, `routers/admin.py`), the LinkedIn import and the AI suggestions
+- `frontend/app/` is the React source of the `/ask` and `/admin` islands
 - `content/blog/` is the writing
 - `frontend/templates/` is the HTML
 - `frontend/public/` is CSS, JavaScript, icons, images, and narration audio
@@ -62,7 +99,7 @@ The pages are server-rendered HTML in an app shell: a sidebar on wide screens (c
 `frontend/public/app.js` is optional. Without it every link, section and post still works. With it:
 
 - `⌘K` / `Ctrl+K` or `/` opens search over sections, posts, projects, profiles and tools
-- `?` shows the shortcuts, `G` then `H`, `A`, `P`, `W`, `T` or `C` jumps to a section, `[` collapses the sidebar
+- `?` shows the shortcuts, `G` then `H`, `K` (Ask AI), `A`, `P`, `W`, `T` or `C` jumps to a section, `[` collapses the sidebar
 
 Navigation items and the palette index live in `app/shell.py`. Icons are inline SVG from `app/icons.py`.
 

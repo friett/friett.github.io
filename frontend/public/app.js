@@ -39,7 +39,7 @@ document.querySelectorAll("[data-mod]").forEach((node) => {
 const THEME_KEY = "fried:theme";
 const THEMES = ["system", "light", "dark"];
 const THEME_LABEL = { system: "System", light: "Light", dark: "Dark" };
-const NAV_COLOR = { light: "#f1f2f6", dark: "#0c0d12" };
+const NAV_COLOR = { light: "#f0f3f2", dark: "#0a0e0d" };
 
 function getTheme() {
   const value = root.getAttribute("data-theme");
