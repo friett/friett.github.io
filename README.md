@@ -2,7 +2,7 @@
 
 Personal site: the portfolio and the blog. One FastAPI app serves the pages, the JSON API, and the files in `frontend/public`.
 
-Live site: https://agent.fastapicloud.dev
+Live site: https://fried.coldfinch.eu (also served at https://agent.fastapicloud.dev)
 
 ## Develop
 
@@ -23,13 +23,15 @@ uv run fastapi deploy
 
 The GitHub Actions workflow `.github/workflows/deploy.yml` ("Validate and deploy") runs ruff and pytest on every pull request. On a push to `main` it also runs `uv run fastapi deploy`. It reads the repository secrets `FASTAPI_CLOUD_TOKEN` (a deploy token for the `agent` app) and `FASTAPI_CLOUD_APP_ID`.
 
-This directory is linked to the FastAPI Cloud app named `agent` on the Xomnia team. That command updates https://agent.fastapicloud.dev. The CLI prints the URL again when the deploy finishes.
+This directory is linked to the FastAPI Cloud app named `agent` on the Xomnia team. That command updates https://fried.coldfinch.eu and https://agent.fastapicloud.dev. The CLI prints the URL again when the deploy finishes.
 
 FastAPI Cloud sets `FASTAPI_PUBLIC_URL` to the app address, or to the first custom domain once one is attached. Canonical links, the sitemap, and `/llms.txt` use that value. On your machine they use the local host instead.
 
 ## Custom domain
 
-Attach a domain after a deploy has succeeded.
+`fried.coldfinch.eu` is attached. It is the team's only custom domain on the Hobby plan. Its DNS is a DNS-only (grey cloud) CNAME in Cloudflare that points to `a3d689e3-23c0-4669-ab04-28173aafb756.custom-domains.fastapicloud.dev`.
+
+To attach a different domain, a deploy must succeed first.
 
 1. Open the app in the [FastAPI Cloud dashboard](https://fastapicloud.com).
 2. Choose Domains.
