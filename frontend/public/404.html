@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Page not found | Fried Schölvinck</title>
+    <meta name="robots" content="noindex">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'><text y='32' font-size='32'>🍟</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500&family=Playfair+Display:wght@500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles.css">
+    <script>
+      (() => {
+        const stored = localStorage.getItem("theme");
+        const dark = stored ? stored === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+        document.documentElement.classList.toggle("dark", dark);
+      })();
+    </script>
+  </head>
+  <body>
+    <div class="background-pattern" aria-hidden="true"></div>
+    <header class="site-header">
+      <div class="container header-bar">
+        <a class="logo" href="/">Fried.</a>
+      </div>
+    </header>
+    <main id="content">
+      <section class="missing">
+        <div class="container">
+          <p class="role-label">404</p>
+          <h1 class="section-title">Page not found</h1>
+          <p class="lede">That address is not on this site.</p>
+          <a class="live-link" href="/">Back home</a>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
