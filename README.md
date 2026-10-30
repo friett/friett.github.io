@@ -21,6 +21,8 @@ Open http://127.0.0.1:8000. Interactive API docs are at http://127.0.0.1:8000/do
 uv run fastapi deploy
 ```
 
+The GitHub Actions workflow `.github/workflows/deploy.yml` ("Validate and deploy") runs ruff and pytest on every pull request. On a push to `main` it also runs `uv run fastapi deploy`. It reads the repository secrets `FASTAPI_CLOUD_TOKEN` (a deploy token for the `agent` app) and `FASTAPI_CLOUD_APP_ID`.
+
 This directory is linked to the FastAPI Cloud app named `agent` on the Xomnia team. That command updates https://agent.fastapicloud.dev. The CLI prints the URL again when the deploy finishes.
 
 FastAPI Cloud sets `FASTAPI_PUBLIC_URL` to the app address, or to the first custom domain once one is attached. Canonical links, the sitemap, and `/llms.txt` use that value. On your machine they use the local host instead.
@@ -39,7 +41,7 @@ FastAPI Cloud requests and renews the certificate. The full steps, including a z
 
 ## GitHub Pages
 
-The GitHub Pages workflow is gone, so a push to `main` does not publish a second copy of the site. https://friett.github.io/ still shows the previous build until GitHub Pages is turned off in the repository settings (Settings, Pages, then disable the source).
+The GitHub Pages workflow is gone. The deploy workflow now publishes to FastAPI Cloud, so a push to `main` does not publish a second copy of the site. https://friett.github.io/ still shows the previous build until GitHub Pages is turned off in the repository settings (Settings, Pages, then disable the source).
 
 ## Layout
 
