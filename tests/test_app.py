@@ -1,9 +1,19 @@
+import json
+import re
+
 from fastapi.testclient import TestClient
 
 from app.blog import blog_store
 from app.main import app
 
 client = TestClient(app)
+
+
+def _current_sections(page: str) -> list[str]:
+    """Navigation sections the server marks as the current page."""
+    return re.findall(r'data-section="([a-z]+)"[^>]*aria-current="page"', page)
+
+
 HTML = {"accept": "text/html"}
 
 
@@ -88,3 +98,59 @@ def test_assets_sitemap_and_unknown_page() -> None:
     missing = client.get("/not-a-page", headers=HTML)
     assert missing.status_code == 404
     assert "Page not found" in missing.text
+
+
+def test_manifest_and_app_icons() -> None:
+    response = client.get("/manifest.webmanifest")
+    assert response.status_code == 200
+    assert response.headers["content-type"].startswith("application/manifest+json")
+    manifest = response.json()
+    assert manifest["start_url"] == "/"
+    assert manifest["display"] == "standalone"
+    purposes = {icon.get("purpose", "any") for icon in manifest["icons"]}
+    assert "maskable" in purposes
+    for icon in manifest["icons"]:
+        assert client.get(icon["src"]).status_code == 200
+    assert client.get("/icons/apple-touch-icon.png").status_code == 200
+
+
+def test_pages_carry_the_shell_and_home_screen_tags() -> None:
+    page = client.get("/").text
+    assert '<link rel="manifest" href="/manifest.webmanifest">' in page
+    assert 'rel="apple-touch-icon"' in page
+    assert 'name="theme-color" media="(prefers-color-scheme: dark)"' in page
+    assert "viewport-fit=cover" in page
+    assert 'localStorage.getItem("fried:theme")' in page
+    assert 'class="sidebar"' in page
+    assert 'class="tabbar"' in page
+    assert 'id="contact"' in page
+    assert _current_sections(page) == ["home", "home"]
+    assert 'id="project-catfinder"' in page
+
+
+def test_palette_index_lists_sections_posts_projects_and_profiles() -> None:
+    page = client.get("/blog/raycast").text
+    start = page.index('<script type="application/json" id="palette-data">')
+    raw = page[start:].split(">", 1)[1].split("</script>", 1)[0]
+    items = json.loads(raw)
+    groups = {item["group"] for item in items}
+    assert {"Go to", "Writing", "Projects", "Profiles", "Tools", "Theme"} <= groups
+    hrefs = {item.get("href") for item in items}
+    assert "/blog/dokploy" in hrefs
+    assert "/#project-coldfinch" in hrefs
+    assert "https://github.com/friett" in hrefs
+
+
+def test_post_has_a_server_rendered_table_of_contents() -> None:
+    page = client.get("/blog/openwebui").text
+    assert 'id="toc"' in page
+    assert 'href="#what-is-openwebui"' in page
+    assert 'id="what-is-openwebui"' in page
+    assert _current_sections(page) == ["writing", "writing"]
+    toc = client.get("/api/posts/openwebui").json()["toc"]
+    assert toc[0] == {
+        "id": "what-is-openwebui",
+        "title": "What is OpenWebUI?",
+        "level": 2,
+    }
+    assert any(entry["level"] == 3 for entry in toc)

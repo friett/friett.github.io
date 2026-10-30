@@ -1,5 +1,6 @@
 import re
 from datetime import date, datetime
+from html import unescape
 from pathlib import Path
 from xml.etree.ElementTree import Element
 
@@ -8,7 +9,7 @@ from markdown import Markdown
 from markdown.extensions import Extension
 from markdown.treeprocessors import Treeprocessor
 
-from app.models import Post, PostSummary
+from app.models import Post, PostSummary, TocEntry
 from app.paths import AUDIO_DIR, BLOG_DIR
 
 _SLUG = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
@@ -61,12 +62,40 @@ class _MediaExtension(Extension):
         md.treeprocessors.register(_MediaTreeprocessor(md), "media", 15)
 
 
-def render_markdown(text: str) -> str:
-    parser = Markdown(
+def _parser() -> Markdown:
+    return Markdown(
         extensions=["fenced_code", "tables", "sane_lists", "toc", _MediaExtension()],
         output_format="html",
     )
-    return parser.convert(text).strip()
+
+
+def render_markdown(text: str) -> str:
+    return _parser().convert(text).strip()
+
+
+def render_with_toc(text: str) -> tuple[str, list[TocEntry]]:
+    """Render markdown and list its h2 and h3 headings for the table of contents."""
+    parser = _parser()
+    html = parser.convert(text).strip()
+    entries: list[TocEntry] = []
+
+    def walk(tokens: list[dict[str, object]]) -> None:
+        for token in tokens:
+            level = token.get("level")
+            if level in (2, 3):
+                entries.append(
+                    TocEntry(
+                        id=str(token["id"]),
+                        title=unescape(str(token["name"])),
+                        level=int(level),
+                    )
+                )
+            children = token.get("children")
+            if isinstance(children, list):
+                walk(children)
+
+    walk(getattr(parser, "toc_tokens", []))
+    return html, entries
 
 
 def render_inline(text: str) -> str:
@@ -117,11 +146,8 @@ class BlogStore:
         summary = self._summary(path)
         loaded = frontmatter.load(path)
         body = loaded.content.strip()
-        return Post(
-            **summary.model_dump(),
-            markdown=body,
-            html=render_markdown(body),
-        )
+        html, toc = render_with_toc(body)
+        return Post(**summary.model_dump(), markdown=body, html=html, toc=toc)
 
     def _paths(self) -> list[Path]:
         if not self.directory.is_dir():

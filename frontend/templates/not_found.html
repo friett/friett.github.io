@@ -1,12 +1,14 @@
 {% extends "base.html" %}
 
 {% block content %}
-<section class="missing">
-  <div class="container">
-    <p class="role-label">404</p>
-    <h1 class="section-title">Post not found</h1>
-    <p class="lede">This post does not exist.</p>
-    <a class="live-link" href="/">Back home</a>
+<section class="missing" aria-labelledby="missing-title">
+  <p class="eyebrow">404</p>
+  <h1 class="hero-title" id="missing-title">Post not found</h1>
+  <p class="lede">This post does not exist.</p>
+  <div class="hero-actions">
+    <a class="btn btn-primary" href="/#blog">{{ icon("notebook-pen") }}All writing</a>
+    <a class="btn" href="/">{{ icon("house") }}Back home</a>
+    <button type="button" class="btn js-only" data-action="palette">{{ icon("search") }}Search</button>
   </div>
 </section>
 {% endblock %}
