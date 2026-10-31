@@ -4,9 +4,9 @@ from typing import Any
 from fastapi import APIRouter, Request
 from fastapi.responses import HTMLResponse
 
-from app.blog import BlogStore
 from app.deps import BlogStoreDep, PublicUrlDep, SiteDep
 from app.models import Post, PostSummary, Site
+from app.posts import PostSource
 from app.render import templates
 from app.shell import palette_index, profiles
 from app.site import HOME_DESCRIPTION, HOME_TITLE, person_json_ld, post_json_ld
@@ -32,7 +32,7 @@ def _render(
     name: str,
     *,
     site: Site,
-    blog: BlogStore,
+    blog: PostSource,
     public_url: str,
     current: str,
     status_code: int = 200,

@@ -48,6 +48,8 @@ The site keeps its content in a database, so it changes without a deploy.
 | `SITE_ORIGIN`, `SITE_RP_ID` | The public origin (`https://example.com`) and its host name, for passkeys and same-origin checks. |
 | `SITE_HTTPS_ONLY` | `true` in production. |
 | `GROQ_API_KEY` | The hosted chat and AI suggestions. Without it, only the private mode works. |
+| `PORTAL_URL` | The portal that holds the blog posts. The default is `https://api-421d8344.fastapicloud.dev`. |
+| `PORTAL_REVALIDATE_SECRET` | The secret the portal sends to `POST /api/revalidate`. Without it, that route is off. |
 
 Set secrets with `uv run fastapi cloud env set --secret NAME`.
 
@@ -87,7 +89,7 @@ The GitHub Pages workflow is gone. The deploy workflow now publishes to FastAPI 
 
 - `app/` is the FastAPI app: pages, the JSON API, markdown rendering, the content store (`content.py`, `db.py`), visit counting (`tracking.py`), the chat (`chat.py`), the admin (`auth.py`, `routers/admin.py`), the LinkedIn import and the AI suggestions
 - `frontend/app/` is the React source of the `/ask` and `/admin` islands
-- `content/blog/` is the writing
+- `content/blog/` is a backup copy of the writing. The portal is the source (see Blog)
 - `frontend/templates/` is the HTML
 - `frontend/public/` is CSS, JavaScript, icons, images, and narration audio
 - `app.frontend()` serves `frontend/public`
@@ -121,19 +123,23 @@ The screenshots go to `artifacts/screenshots/`, which git ignores.
 
 ## Blog
 
-Add a markdown file in `content/blog`. The filename is the URL slug: `content/blog/my-note.md` is served at `/blog/my-note`.
+The portal is the source of the blog posts. Write and publish them at https://api-421d8344.fastapicloud.dev/writing. The site does not edit posts.
 
-```markdown
----
-title: "Title"
-date: "2026-10-28"
-tags: ["AI"]
----
+The site reads the portal's public API (`app/posts.py`):
 
-The post.
-```
+- `GET {PORTAL_URL}/api/public/posts` for the list, newest first
+- `GET {PORTAL_URL}/api/public/posts/{slug}` for one post with its markdown body
 
-To add narration, save an MP3 at `frontend/public/audio/my-note.mp3`. The post page adds a player when that file exists. The old generator lived in a local `voice/` directory and was not part of the repository. The MP3s already in `frontend/public/audio/` are the recordings that ship with the site.
+The home page, the post pages, the sitemap, `/llms.txt`, the search palette, the chat context and `/api/posts` all use it.
+
+- **Cache.** Each answer is kept in memory for five minutes.
+- **Portal down.** The site shows the last good copy. It tries the portal again after 30 seconds.
+- **Portal never answered.** If the portal has not answered once since the app started, the site shows the markdown files in `content/blog`. These files are only a backup. Edits to them do not reach the live site while the portal works.
+- **Revalidate.** The portal calls `POST /api/revalidate` with `Authorization: Bearer <PORTAL_REVALIDATE_SECRET>` when a post is published. The site then asks the portal again on the next request. The route answers 401 for a wrong secret, and 404 when `PORTAL_REVALIDATE_SECRET` is not set.
+
+Image paths in a post body, like `/images/blog/owui.png`, point at files in `frontend/public`. Add new images there.
+
+To add narration, save an MP3 at `frontend/public/audio/<slug>.mp3`. The post page adds a player when that file exists. The old generator lived in a local `voice/` directory and was not part of the repository. The MP3s already in `frontend/public/audio/` are the recordings that ship with the site.
 
 ## Checks
 
