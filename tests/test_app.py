@@ -1,10 +1,15 @@
 import json
 import re
 
+import httpx
 from fastapi.testclient import TestClient
 
+from app import projects as projects_mod
 from app.blog import blog_store
+from app.deps import get_project_source
 from app.main import app
+from app.paths import PROJECTS_BACKUP
+from tests.test_projects import Portal
 
 client = TestClient(app)
 
@@ -22,11 +27,10 @@ def test_home_includes_portfolio_and_posts() -> None:
     assert response.status_code == 200
     page = response.text
     assert "Hello, I'm Fried." in page
-    assert "Coldfinch" in page
-    assert "CatFinder" in page
-    assert "Vodafone Ziggo" in page
+    assert "Xomnia" in page
     assert "Arc Browser" in page
     assert "/blog/dokploy" in page
+    assert 'href="/projects"' in page
     assert "<audio" not in page
     assert 'data-filter="FastAPI"' in page
     assert "min read" in page
@@ -125,20 +129,28 @@ def test_pages_carry_the_shell_and_home_screen_tags() -> None:
     assert 'class="tabbar"' in page
     assert 'id="contact"' in page
     assert _current_sections(page) == ["home", "home"]
-    assert 'id="project-catfinder"' in page
 
 
 def test_palette_index_lists_sections_posts_projects_and_profiles() -> None:
-    page = client.get("/blog/raycast").text
-    start = page.index('<script type="application/json" id="palette-data">')
-    raw = page[start:].split(">", 1)[1].split("</script>", 1)[0]
-    items = json.loads(raw)
-    groups = {item["group"] for item in items}
-    assert {"Go to", "Writing", "Projects", "Profiles", "Tools", "Theme"} <= groups
-    hrefs = {item.get("href") for item in items}
-    assert "/blog/dokploy" in hrefs
-    assert "/#project-coldfinch" in hrefs
-    assert "https://github.com/friett" in hrefs
+    source = projects_mod.PortalProjects(
+        "https://portal.test",
+        projects_mod.JsonProjectStore(PROJECTS_BACKUP),
+        transport=httpx.MockTransport(Portal()),
+    )
+    app.dependency_overrides[get_project_source] = lambda: source
+    try:
+        page = client.get("/blog/raycast").text
+        start = page.index('<script type="application/json" id="palette-data">')
+        raw = page[start:].split(">", 1)[1].split("</script>", 1)[0]
+        items = json.loads(raw)
+        groups = {item["group"] for item in items}
+        assert {"Go to", "Writing", "Projects", "Profiles", "Tools", "Theme"} <= groups
+        hrefs = {item.get("href") for item in items}
+        assert "/blog/dokploy" in hrefs
+        assert "/projects#coldfinch" in hrefs
+        assert "https://github.com/friett" in hrefs
+    finally:
+        app.dependency_overrides.pop(get_project_source, None)
 
 
 def test_post_has_a_server_rendered_table_of_contents() -> None:

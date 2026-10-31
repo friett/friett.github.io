@@ -24,7 +24,7 @@ import { go, replace } from "./route.ts";
 import { isKind, KIND, KINDS, metaOf, sortEntries, titleOf } from "./schema.ts";
 import { Blank, Card, Confirm, IconButton, Loading, Notice, Pill, SectionHeader, Segmented, When, useToast } from "./ui.tsx";
 
-const SITE_PAGE: Record<Kind, string> = { profile: "/#about", role: "/#experience", project: "/#projects", skill: "/#skills", tool: "/#tools" };
+const SITE_PAGE: Record<Kind, string> = { profile: "/#about", role: "/#experience", project: "/projects", skill: "/#skills", tool: "/#tools" };
 const EMPTY: Data = {};
 // Blog posts live in the portal, not in this admin.
 const PORTAL_WRITING = "https://api-421d8344.fastapicloud.dev/writing";

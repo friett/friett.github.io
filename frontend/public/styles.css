@@ -896,6 +896,106 @@ a.row:hover {
   padding: var(--space-4);
   scroll-margin-top: var(--space-6);
 }
+.project-grid {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+}
+.project-grid-compact {
+  margin-bottom: var(--space-2);
+}
+.project-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  scroll-margin-top: var(--space-6);
+}
+.project-card-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+.project-name {
+  margin: 0;
+  font-size: var(--fs-md);
+  font-weight: var(--fw-semibold);
+}
+.project-name a {
+  color: inherit;
+  text-decoration: none;
+}
+.project-name a:hover {
+  color: var(--accent);
+}
+.project-summary {
+  margin: 0;
+  max-width: 62ch;
+}
+.project-type {
+  margin: 0;
+  font-size: var(--fs-sm);
+}
+.project-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin: 0;
+}
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.12rem 0.45rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--entity-projects) 16%, transparent);
+  color: var(--entity-projects);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-medium);
+  line-height: 1.35;
+}
+.badge-muted {
+  background: var(--surface-2);
+  color: var(--text-secondary);
+}
+.project-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: auto;
+  padding-top: var(--space-2);
+}
+.project-links .btn {
+  margin-top: 0;
+}
+.project-updated {
+  margin: var(--space-1) 0 0;
+  color: var(--text-tertiary);
+  font-size: var(--fs-xs);
+}
+.empty-state {
+  margin: 0;
+  padding: var(--space-4);
+  border: 1px dashed var(--border-hairline);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  text-align: center;
+}
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.page-head {
+  padding-bottom: 0;
+}
 .highlights {
   margin: var(--space-2) 0 0;
   padding-left: 1.1rem;

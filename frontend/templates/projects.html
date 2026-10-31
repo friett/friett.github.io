@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="section page-head" aria-labelledby="projects-page-title">
+  <header class="section-head">
+    <h1 class="section-title" id="projects-page-title"><span class="entity" data-entity="projects">{{ icon("briefcase-business", 18) }}</span>Projects</h1>
+    <p class="lede">Products and systems I have built through Coldfinch and in my work as an AI engineer. This list stays in sync with my developer portal.</p>
+  </header>
+</section>
+
+<section class="section" aria-labelledby="projects-list-title">
+  <h2 class="visually-hidden" id="projects-list-title">All projects</h2>
+  {% if not portal_projects %}
+  <p class="empty-state">No public projects yet. Check back soon.</p>
+  {% else %}
+  <div class="project-grid">
+    {% for project in portal_projects %}
+    <article class="card project-card" id="{{ project.slug }}" data-match="{{ (project.name ~ ' ' ~ project.summary ~ ' ' ~ project.tags|join(' ') ~ ' ' ~ project.status ~ ' ' ~ project.stage ~ ' ' ~ project.type) | lower }}">
+      <div class="project-card-head">
+        <h3 class="project-name">{{ project.name }}</h3>
+        {% if project.status or project.stage %}
+        <p class="project-badges">
+          {% if project.status %}<span class="badge">{{ project.status }}</span>{% endif %}
+          {% if project.stage %}<span class="badge badge-muted">{{ project.stage }}</span>{% endif %}
+        </p>
+        {% endif %}
+      </div>
+      {% if project.summary %}<p class="muted project-summary">{{ project.summary }}</p>{% endif %}
+      {% if project.type %}<p class="project-type muted">{{ project.type }}</p>{% endif %}
+      {% if project.tags %}
+      <ul class="pills">
+        {% for tag in project.tags %}<li><button type="button" class="chip" data-filter="{{ tag }}" aria-pressed="false">{{ tag }}</button></li>{% endfor %}
+      </ul>
+      {% endif %}
+      <div class="project-links">
+        {% if project.live_url %}
+        <a class="btn btn-sm live-link" href="{{ project.live_url }}" target="_blank" rel="noopener noreferrer">{{ icon("globe", 15) }}Live site{{ icon("arrow-up-right", 14) }}</a>
+        {% endif %}
+        {% if project.repo_url %}
+        <a class="btn btn-sm" href="{{ project.repo_url }}" target="_blank" rel="noopener noreferrer">{{ icon("github", 15) }}Repository{{ icon("arrow-up-right", 14) }}</a>
+        {% endif %}
+      </div>
+      {% if project.updated_at %}<p class="project-updated"><time datetime="{{ project.updated_at }}">Updated {{ project.updated_at | short_date }}</time></p>{% endif %}
+    </article>
+    {% endfor %}
+  </div>
+  <div id="project-empty" class="empty" hidden>
+    <span>No projects match this topic.</span>
+    <button type="button" class="btn btn-sm" data-action="clear-filter">Show all</button>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

@@ -1,6 +1,7 @@
 """Every test run uses a fresh in-memory database with the seeded content.
 
-The portal is never called: its requests fail, so pages show the local posts.
+The portal is never called: its requests fail, so pages show the local posts
+and the bundled projects backup.
 """
 
 import os
@@ -19,7 +20,8 @@ import pytest  # noqa: E402
 from app import tracking  # noqa: E402
 from app.content import seed  # noqa: E402
 from app.db import init_db  # noqa: E402
-from app.posts import post_source  # noqa: E402
+from app.posts import post_source
+from app.projects import project_source  # noqa: E402
 
 init_db()
 seed()
@@ -31,6 +33,7 @@ def _no_portal(request: httpx.Request) -> httpx.Response:
 
 
 post_source.transport = httpx.MockTransport(_no_portal)
+project_source.transport = httpx.MockTransport(_no_portal)
 
 
 @pytest.fixture

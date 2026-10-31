@@ -130,7 +130,8 @@ def test_the_owner_edits_content_and_the_page_follows() -> None:
     )
     assert saved.status_code == 200
     assert saved.json()["source"] == "admin"
-    assert "A brand new description for the test." in TestClient(app).get("/").text
+    site = TestClient(app).get("/api/site").json()
+    assert site["projects"][0]["description"] == "A brand new description for the test."
     owner.patch(
         f"/api/admin/entries/{first['id']}",
         json={"visible": False},
