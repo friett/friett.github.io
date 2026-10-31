@@ -671,7 +671,12 @@ function applyFilter(query) {
   const anyVisible = (selector) => matchNodes.some((node) => node.closest(selector) && !node.hidden);
   const projectEmpty = document.getElementById("project-empty");
   const blogEmpty = document.getElementById("blog-empty");
-  if (projectEmpty) projectEmpty.hidden = !currentTopic || anyVisible("#projects");
+  if (projectEmpty) {
+    const hasProjects = matchNodes.some(
+      (node) => node.classList.contains("project-card") && !node.hidden,
+    );
+    projectEmpty.hidden = !currentTopic || hasProjects;
+  }
   if (blogEmpty) blogEmpty.hidden = !currentTopic || anyVisible("#blog");
   syncFilterClear();
   const url = new URL(window.location.href);

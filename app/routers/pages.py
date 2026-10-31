@@ -4,8 +4,15 @@ from typing import Any
 from fastapi import APIRouter, Request
 from fastapi.responses import HTMLResponse
 
-from app.deps import BlogStoreDep, PublicUrlDep, SiteDep
-from app.models import Post, PostSummary, Site
+from app.deps import (
+    BlogStoreDep,
+    ProjectSourceDep,
+    PublicUrlDep,
+    SiteDep,
+    get_project_source,
+    resolve_project_source,
+)
+from app.models import Post, PostSummary, PublicProject, Site
 from app.posts import PostSource
 from app.render import templates
 from app.shell import palette_index, profiles
@@ -36,10 +43,13 @@ def _render(
     public_url: str,
     current: str,
     status_code: int = 200,
+    portal_projects: list[PublicProject] | None = None,
     **context: Any,
 ) -> HTMLResponse:
     """Render a page inside the shell: navigation, palette and footer."""
     posts = context.get("posts") or blog.list_posts()
+    if portal_projects is None:
+        portal_projects = resolve_project_source().list_projects()
     return templates.TemplateResponse(
         request,
         name,
@@ -49,7 +59,8 @@ def _render(
             "public_url": public_url,
             "current": current,
             "profiles": profiles(site),
-            "palette": palette_index(site, posts),
+            "palette": palette_index(site, posts, portal_projects),
+            "portal_projects": portal_projects,
             **context,
         },
         status_code=status_code,
@@ -61,8 +72,10 @@ def home(
     request: Request,
     site: SiteDep,
     blog: BlogStoreDep,
+    projects: ProjectSourceDep,
     public_url: PublicUrlDep,
 ) -> HTMLResponse:
+    portal_projects = projects.list_projects()
     return _render(
         request,
         "index.html",
@@ -71,12 +84,43 @@ def home(
         public_url=public_url,
         current="home",
         posts=blog.list_posts(),
+        portal_projects=portal_projects,
+        highlight_projects=portal_projects[:3],
         canonical=f"{public_url}/",
         page_title=HOME_TITLE,
         page_description=HOME_DESCRIPTION,
         og_type="website",
         robots=INDEXABLE,
         json_ld=person_json_ld(public_url),
+    )
+
+
+@router.get("/projects", response_class=HTMLResponse)
+def projects_page(
+    request: Request,
+    site: SiteDep,
+    blog: BlogStoreDep,
+    projects: ProjectSourceDep,
+    public_url: PublicUrlDep,
+) -> HTMLResponse:
+    portal_projects = projects.list_projects()
+    return _render(
+        request,
+        "projects.html",
+        site=site,
+        blog=blog,
+        public_url=public_url,
+        current="projects",
+        portal_projects=portal_projects,
+        canonical=f"{public_url}/projects",
+        page_title="Projects | Fried Schölvinck",
+        page_description=(
+            "Products and systems Fried has built through Coldfinch "
+            "and as an AI engineer."
+        ),
+        og_type="website",
+        robots=INDEXABLE,
+        json_ld=None,
     )
 
 

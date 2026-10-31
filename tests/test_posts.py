@@ -193,14 +193,21 @@ def secret(monkeypatch: pytest.MonkeyPatch) -> str:
 def test_revalidate_clears_the_cache(
     secret: str, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    cleared: list[bool] = []
-    monkeypatch.setattr(posts.post_source, "clear", lambda: cleared.append(True))
+    cleared: list[str] = []
+
+    def mark(kind: str) -> None:
+        cleared.append(kind)
+
+    monkeypatch.setattr(posts.post_source, "clear", lambda: mark("posts"))
+    monkeypatch.setattr(
+        "app.projects.project_source.clear", lambda: mark("projects")
+    )
     response = client.post(
         "/api/revalidate", headers={"Authorization": f"Bearer {secret}"}
     )
     assert response.status_code == 200
     assert response.json() == {"ok": True}
-    assert cleared == [True]
+    assert sorted(cleared) == ["posts", "projects"]
 
 
 @pytest.mark.parametrize(

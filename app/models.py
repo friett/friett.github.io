@@ -22,6 +22,19 @@ class Project(BaseModel):
     highlights: list[str] = Field(default_factory=list)
 
 
+class PublicProject(BaseModel):
+    slug: str
+    name: str
+    summary: str = ""
+    status: str = ""
+    stage: str = ""
+    type: str = ""
+    live_url: str | None = None
+    repo_url: str | None = None
+    tags: list[str] = Field(default_factory=list)
+    updated_at: str = ""
+
+
 class Tool(BaseModel):
     name: str
     icon: str

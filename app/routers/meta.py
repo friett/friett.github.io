@@ -4,7 +4,7 @@ from fastapi import APIRouter
 from fastapi.responses import JSONResponse, PlainTextResponse, Response
 
 from app.content import load_site
-from app.deps import BlogStoreDep, PublicUrlDep
+from app.deps import BlogStoreDep, ProjectSourceDep, PublicUrlDep
 from app.site import HOME_DESCRIPTION
 
 router = APIRouter(include_in_schema=False)
@@ -50,7 +50,7 @@ def manifest() -> JSONResponse:
     ]
     shortcuts = [
         {"name": "Writing", "url": "/#blog"},
-        {"name": "Projects", "url": "/#projects"},
+        {"name": "Projects", "url": "/projects"},
     ]
     return JSONResponse(
         {
@@ -72,10 +72,20 @@ def manifest() -> JSONResponse:
 
 
 @router.get("/sitemap.xml")
-def sitemap(public_url: PublicUrlDep, blog: BlogStoreDep) -> Response:
+def sitemap(
+    public_url: PublicUrlDep,
+    blog: BlogStoreDep,
+    projects: ProjectSourceDep,
+) -> Response:
     entries: list[tuple[str, str, str, str | None]] = [
-        (f"{public_url}/", "monthly", "1.0", None)
+        (f"{public_url}/", "monthly", "1.0", None),
+        (f"{public_url}/projects", "weekly", "0.9", None),
     ]
+    for project in projects.list_projects():
+        lastmod = project.updated_at or None
+        entries.append(
+            (f"{public_url}/projects#{project.slug}", "monthly", "0.6", lastmod)
+        )
     for post in blog.list_posts():
         entries.append(
             (f"{public_url}/blog/{post.slug}", "yearly", "0.7", post.date or None)
@@ -97,7 +107,11 @@ def sitemap(public_url: PublicUrlDep, blog: BlogStoreDep) -> Response:
 
 
 @router.get("/llms.txt", response_class=PlainTextResponse)
-def llms(public_url: PublicUrlDep, blog: BlogStoreDep) -> str:
+def llms(
+    public_url: PublicUrlDep,
+    blog: BlogStoreDep,
+    projects: ProjectSourceDep,
+) -> str:
     lines = [
         f"# {load_site().name}",
         "",
@@ -113,8 +127,11 @@ def llms(public_url: PublicUrlDep, blog: BlogStoreDep) -> str:
         "## Main pages",
         "",
         (
-            f"- [Home and selected work]({public_url}/): Biography, skills, "
-            "projects and writing."
+            f"- [Home]({public_url}/): Biography, skills, selected work and writing."
+        ),
+        (
+            f"- [Projects]({public_url}/projects): "
+            "Work and products from the developer portal."
         ),
         (
             "- [Coldfinch](https://coldfinch.eu/): Managed open-source and "
@@ -129,9 +146,29 @@ def llms(public_url: PublicUrlDep, blog: BlogStoreDep) -> str:
             "by Coldfinch."
         ),
         "",
-        "## Writing",
+        "## Projects",
         "",
     ]
+    portal_projects = projects.list_projects()
+    if portal_projects:
+        for project in portal_projects:
+            line = f"- [{project.name}]({public_url}/projects#{project.slug})"
+            if project.summary:
+                line += f": {project.summary}"
+            if project.live_url:
+                line += f" Live: {project.live_url}."
+            lines.append(line)
+    else:
+        lines.append(
+            f"- [Projects index]({public_url}/projects): Portal-backed project list."
+        )
+    lines.extend(
+        [
+            "",
+            "## Writing",
+            "",
+        ]
+    )
     for post in blog.list_posts():
         lines.append(f"- [{post.title}]({public_url}/blog/{post.slug})")
     lines.extend(

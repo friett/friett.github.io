@@ -3,7 +3,7 @@
 import re
 from typing import NamedTuple
 
-from app.models import PostSummary, Site
+from app.models import PostSummary, PublicProject, Site
 
 
 class NavItem(NamedTuple):
@@ -17,7 +17,7 @@ class NavItem(NamedTuple):
 HOME = NavItem("home", "Home", "/", "house", "h")
 ASK = NavItem("ask", "Ask AI", "/ask", "sparkles", "k")
 ABOUT = NavItem("about", "About", "/#about", "user", "a")
-PROJECTS = NavItem("projects", "Projects", "/#projects", "briefcase-business", "p")
+PROJECTS = NavItem("projects", "Projects", "/projects", "briefcase-business", "p")
 WRITING = NavItem("writing", "Writing", "/#blog", "notebook-pen", "w")
 TOOLS = NavItem("tools", "Tools", "/#tools", "wrench", "t")
 CONTACT = NavItem("contact", "Contact", "#contact", "at-sign", "c")
@@ -41,7 +41,11 @@ def profiles(site: Site) -> list[dict[str, str]]:
     ]
 
 
-def palette_index(site: Site, posts: list[PostSummary]) -> list[dict[str, object]]:
+def palette_index(
+    site: Site,
+    posts: list[PostSummary],
+    projects: list[PublicProject],
+) -> list[dict[str, object]]:
     """Everything the command palette can find, in display order."""
     items: list[dict[str, object]] = []
     for item in SHORTCUT_TARGETS:
@@ -67,15 +71,18 @@ def palette_index(site: Site, posts: list[PostSummary]) -> list[dict[str, object
                 "entity": "writing",
             }
         )
-    for project in site.projects:
+    for project in projects:
+        keywords = " ".join(
+            [*project.tags, project.summary, project.status, project.stage]
+        )
         items.append(
             {
                 "group": "Projects",
-                "label": project.title,
-                "href": f"/#project-{slugify(project.title)}",
+                "label": project.name,
+                "href": f"/projects#{project.slug}",
                 "icon": "briefcase-business",
-                "keywords": " ".join([*project.tags, project.description]),
-                "hint": project.date,
+                "keywords": keywords,
+                "hint": project.stage or project.status or project.type,
                 "entity": "projects",
             }
         )
