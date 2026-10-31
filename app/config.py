@@ -40,6 +40,19 @@ class Settings(BaseSettings):
     chat_visitor_daily: int = 30
     chat_site_daily: int = 600
 
+    # The portal holds the blog posts. It calls POST /api/revalidate with this secret
+    # when a post is published; without the secret that route answers 404.
+    portal_url: str = Field(
+        default="https://api-421d8344.fastapicloud.dev",
+        validation_alias=AliasChoices("site_portal_url", "portal_url"),
+    )
+    portal_revalidate_secret: str = Field(
+        default="",
+        validation_alias=AliasChoices(
+            "site_portal_revalidate_secret", "portal_revalidate_secret"
+        ),
+    )
+
 
 @lru_cache
 def get_settings() -> Settings:

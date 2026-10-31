@@ -26,6 +26,8 @@ import { Blank, Card, Confirm, IconButton, Loading, Notice, Pill, SectionHeader,
 
 const SITE_PAGE: Record<Kind, string> = { profile: "/#about", role: "/#experience", project: "/#projects", skill: "/#skills", tool: "/#tools" };
 const EMPTY: Data = {};
+// Blog posts live in the portal, not in this admin.
+const PORTAL_WRITING = "https://api-421d8344.fastapicloud.dev/writing";
 
 export function Content({ parts, gap, onClearGap }: { parts: string[]; gap: string; onClearGap: () => void }) {
   const kind: Kind = isKind(parts[0]) ? parts[0] : "profile";
@@ -127,6 +129,13 @@ export function Content({ parts, gap, onClearGap }: { parts: string[]; gap: stri
           options={KINDS.map((k) => ({ value: k.kind, label: k.label }))}
         />
       </div>
+      <p className="text-sm text-muted-foreground">
+        Blog posts are written and published in the{" "}
+        <a href={PORTAL_WRITING} target="_blank" rel="noopener" className="underline underline-offset-2 hover:text-foreground">
+          portal
+        </a>
+        . The site shows them within five minutes, or right away when the portal revalidates.
+      </p>
 
       {error && (
         <Notice
